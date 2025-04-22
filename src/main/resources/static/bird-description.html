@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bird Description - Willy's Bird Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/images/bird-icon.png">
+    <style>
+        /* Color Palette */
+        :root {
+            --color-primary: #4CAF50; /* Primary brand color */
+            --color-primary-dark: #45a049; /* Darker shade of primary */
+            --color-text-dark: #222; /* Darkest text color */
+            --color-text-medium: #555; /* Medium text color */
+            --color-text-light: #777; /* Light text color */
+            --color-background: #f9f9f9; /* Background color */
+            --color-background-light: #ffffff; /* Light background */
+            --color-accent: #FFD700; /* Accent color (e.g., for stars) */
+            --color-border: #ccc; /* Border color */
+        }
+
+        /* Base Styling */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Remove existing header styles */
+        /* ...existing styles before header section... */
+
+        /* Homepage Header Styles */
+        .header {
+            background-color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav {
+            background-color: #333;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav a {
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .nav a:hover {
+            color: #4CAF50;
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-bar {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-width: 200px;
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--color-primary);
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+
+        /* ...rest of existing styles... */
+
+        .bird-description {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two-column layout */
+            max-width: 1200px;
+            margin: 3rem auto; /* Generous vertical margin, centered alignment */
+            padding: 0 2rem; /* Horizontal padding */
+            gap: 4rem; /* Space between columns */
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr; /* Stack columns on mobile */
+                gap: 2rem; /* Adjust gap for smaller screens */
+            }
+        }
+
+        .image-section img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .details-section {
+            padding: 20px 0; /* Removed left/right padding for better alignment */
+        }
+
+        .details-section h2 {
+            font-size: 2.5rem;
+            margin: 0 0 15px 0; /* Added top margin of 0 for better spacing */
+            color: var(--color-text-dark);
+        }
+
+        .details-section .price-tag {
+            font-size: 1.8rem;
+            color: var(--color-primary);
+            margin: 20px 0; /* Consistent margins */
+        }
+
+        .details-section .description {
+            font-size: 1.2rem;
+            margin: 0 0 20px 0; /* Removed top margin for better spacing */
+            color: var(--color-text-medium);
+            line-height: 1.6; /* Improved readability */
+        }
+
+        .buy-button {
+            padding: 12px 25px; /* Slightly larger button */
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: inline-block; /* Better alignment */
+        }
+
+        .buy-button:hover {
+            background-color: var(--color-primary-dark);
+        }
+
+        .care-requirements {
+            margin: 30px 0; /* Consistent vertical spacing */
+            padding: 20px;
+            background: var(--color-background-light);
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .care-requirements h3 {
+            font-size: 1.5rem;
+            margin: 0 0 15px 0; /* Removed top margin for better spacing */
+        }
+
+        .care-requirements ul {
+            list-style: none;
+            padding: 0;
+            margin: 0; /* Reset margin for better alignment */
+        }
+
+        .care-requirements li {
+            font-size: 1rem;
+            margin-bottom: 10px; /* More space between list items */
+            padding-left: 20px; /* Add some indentation */
+            position: relative;
+        }
+
+        .care-requirements li:before {
+            content: "•"; /* Simple bullet point */
+            position: absolute;
+            left: 0;
+            color: var(--color-primary);
+        }
+
+        .reviews {
+            margin: 30px 0 0 0; /* Consistent spacing */
+        }
+
+        .reviews h3 {
+            font-size: 1.5rem;
+            margin: 0 0 20px 0; /* Removed top margin for better spacing */
+        }
+
+        .review-card {
+            background-color: var(--color-background-light);
+            padding: 20px; /* More padding for better readability */
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px; /* More space between reviews */
+        }
+
+        .review-card .stars {
+            margin-bottom: 10px;
+        }
+
+        .review-card p {
+            font-size: 1rem;
+            color: var(--color-text-medium);
+            margin: 0 0 10px 0; /* Better spacing */
+        }
+
+        .review-card small {
+            font-size: 0.9rem;
+            color: var(--color-text-light);
+            display: block; /* Ensures proper alignment */
+        }
+
+        .other-birds {
+            margin: 0 auto 60px; /* Center and add bottom margin */
+            padding: 0 40px;
+            max-width: 1200px;
+        }
+
+        .other-birds h3 {
+            font-size: 2rem;
+            margin: 0 0 30px 0; /* Removed top margin for better spacing */
+            text-align: center; /* Center the heading */
+        }
+
+        .birds-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px; /* More space between cards */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .bird-card {
+            background-color: var(--color-background-light);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 350px;
+            transition: transform 0.3s; /* Smooth hover effect */
+        }
+
+        .bird-card:hover {
+            transform: translateY(-5px); /* Slight lift on hover */
+        }
+
+        .bird-card img {
+            width: 100%;
+            height: 160px; /* Fixed height for consistency */
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .bird-card h4 {
+            font-size: 1.2rem;
+            margin: 15px 0; /* Consistent margins */
+        }
+
+        .bird-card .price-tag {
+            font-size: 1rem;
+            color: white;
+            background-color: var(--color-primary);
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 10px 0; /* Consistent margins */
+        }
+
+        .add-to-cart {
+            padding: 10px 15px;
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+            width: 80%; /* Consistent width */
+            margin: 0 auto; /* Center the button */
+        }
+
+        .add-to-cart:hover {
+            background-color: var(--color-primary-dark);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .birds-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .birds-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .birds-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .bird-description, .other-birds {
+                padding: 0 20px;
+            }
+        }
+
+        /* Main Image Container */
+        .image-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .main-image {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Ensures a 1:1 aspect ratio */
+            background-color: var(--color-background-light); /* Light background */
+            border-radius: 0.5rem; /* Subtle rounding */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            overflow: hidden;
+        }
+
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Maintain aspect ratio */
+        }
+
+        /* Thumbnail Gallery */
+        .thumbnail-gallery {
+            display: flex;
+            gap: 1rem; /* Spacing between thumbnails */
+            margin-top: 1rem;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            border-radius: 0.5rem; /* Subtle rounding */
+            overflow: hidden;
+            cursor: pointer; /* Indicate clickability */
+            border: 2px solid transparent; /* Default transparent border */
+            transition: border-color 0.2s; /* Smooth transition */
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Maintain aspect ratio */
+        }
+
+        .thumbnail.active {
+            border-color: var(--color-primary); /* Primary brand color for active thumbnail */
+        }
+
+        /* Product Information Section */
+        .details-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem; /* Spacing between elements */
+        }
+
+        .category-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-light); /* Medium shade */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .product-title {
+            font-size: 2.25rem;
+            font-weight: bold;
+            color: var(--color-text-dark); /* Darkest shade */
+            line-height: 1.2;
+        }
+
+        .price-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem; /* Gap between prices */
+        }
+
+        .current-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--color-primary); /* Primary brand color */
+        }
+
+        .original-price {
+            font-size: 1.125rem;
+            color: #999; /* Medium gray */
+            text-decoration: line-through;
+        }
+
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem; /* Gap between stars and text */
+        }
+
+        .stars {
+            color: var(--color-accent); /* Gold color for stars */
+        }
+
+        .review-text {
+            font-size: 0.875rem;
+            color: #666; /* Light-medium shade */
+        }
+
+        .description {
+            font-size: 1rem;
+            color: var(--color-text-medium); /* Medium shade */
+            line-height: 1.75; /* Better readability */
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem; /* Spacing between features */
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem; /* Gap between icon and text */
+        }
+
+        .feature-item .icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            background-color: #E8F5E9; /* Light background of primary color */
+            color: var(--color-primary); /* Primary brand color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            font-size: 1rem;
+        }
+
+        /* Product Variants Section */
+        .variants-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem; /* Spacing between sections */
+        }
+
+        .variants-title {
+            font-size: 0.875rem;
+            font-weight: 600; /* Semi-bold */
+            color: var(--color-text-dark); /* Dark shade */
+        }
+
+        /* Color Selector */
+        .color-options {
+            display: flex;
+            gap: 0.75rem; /* Spacing between color circles */
+        }
+
+        .color-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            border: 2px solid transparent; /* Default border */
+            transition: transform 0.2s, border-color 0.2s; /* Smooth transitions */
+        }
+
+        .color-circle:hover {
+            transform: scale(1.1); /* Scale on hover */
+        }
+
+        .color-circle.selected {
+            border-color: var(--color-primary); /* Primary brand color for selected */
+        }
+
+        .color-circle.selected::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Style Selector */
+        .style-options {
+            display: flex;
+            gap: 0.5rem; /* Spacing between style buttons */
+        }
+
+        .style-button {
+            min-width: 48px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.875rem;
+            font-weight: 500; /* Medium weight */
+            border: 1px solid var(--color-border); /* Light shade */
+            border-radius: 0.375rem; /* Rounded corners */
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s, background-color 0.2s; /* Smooth transitions */
+        }
+
+        .style-button:hover {
+            border-color: var(--color-primary); /* Primary brand color on hover */
+            color: var(--color-primary);
+        }
+
+        .style-button.selected {
+            background-color: var(--color-primary); /* Primary brand color for selected */
+            color: var(--color-background-light); /* Contrasting text */
+            border-color: var(--color-primary);
+        }
+
+        .style-button.out-of-stock {
+            color: #aaa; /* Light shade for text */
+            border-color: #ddd; /* Lighter border */
+            text-decoration: line-through;
+            cursor: not-allowed; /* Disabled cursor */
+        }
+
+        /* Add to Cart Section */
+        .add-to-cart-section {
+            margin-top: 1rem; /* Separate from variants */
+            display: flex;
+            flex-direction: column;
+            gap: 1rem; /* Spacing between elements */
+        }
+
+        /* Quantity Selector */
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--color-border); /* Light shade */
+            border-radius: 0.375rem; /* Rounded corners */
+            overflow: hidden;
+            width: fit-content;
+        }
+
+        .quantity-selector button {
+            width: 36px;
+            height: 36px;
+            background-color: #f5f5f5; /* Very light shade */
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .quantity-selector button:hover {
+            background-color: var(--color-border); /* Slightly darker shade */
+        }
+
+        .quantity-selector input {
+            width: 48px;
+            text-align: center;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        /* Primary Action Button */
+        .primary-button {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--color-primary); /* Primary brand color */
+            color: white; /* Contrasting text */
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+
+        .primary-button:hover {
+            background-color: var(--color-primary-dark); /* Slightly darker shade */
+        }
+
+        /* Secondary Action Button */
+        .secondary-button {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--color-background-light); /* Light background */
+            color: var(--color-text-medium); /* Medium shade */
+            border: 1px solid var(--color-border); /* Light shade */
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+
+        .secondary-button:hover {
+            background-color: var(--color-background-light); /* Light background */
+            color: var(--color-primary); /* Primary brand color */
+            border-color: var(--color-primary);
+        }
+
+        /* Additional Information Section */
+        .additional-info {
+            margin-top: 1.5rem; /* Separate from previous section */
+            border-top: 1px solid var(--color-border); /* Light shade border */
+            padding-top: 1.5rem; /* Padding above content */
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem; /* Spacing between items */
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem; /* Spacing between icon and text */
+            font-size: 0.875rem; /* Small font size */
+            color: var(--color-text-medium); /* Medium shade */
+        }
+
+        .info-item .icon {
+            font-size: 16px; /* Icon size */
+        }
+
+        /* Recommendations Section */
+        .recommendations {
+            margin: 3rem 0; /* Vertical margin */
+            width: 100%;
+        }
+
+        .recommendations-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .recommendations-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .recommendations-header h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--color-text-dark); /* Darkest shade */
+        }
+
+        .recommendations-header a {
+            font-size: 0.875rem;
+            font-weight: 600; /* Semi-bold */
+            color: var(--color-primary); /* Primary brand color */
+            text-decoration: none;
+            transition: text-decoration 0.2s;
+        }
+
+        .recommendations-header a:hover {
+            text-decoration: underline;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem; /* Space between cards */
+        }
+
+        @media (max-width: 1024px) {
+            .product-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .product-card {
+            background-color: var(--color-background-light); /* Light background */
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px); /* Upward translation */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+        }
+
+        .product-card .image-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1; /* 1:1 aspect ratio */
+            overflow: hidden;
+        }
+
+        .product-card .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover .image-container img {
+            transform: scale(1.05); /* Image scaling */
+        }
+
+        .product-card .badge {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            background-color: var(--color-primary); /* Primary brand color */
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+
+        .product-card .content {
+            padding: 1rem;
+        }
+
+        .product-card .category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--color-text-light); /* Medium shade */
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-card .title {
+            font-size: 1rem;
+            font-weight: 600; /* Semi-bold */
+            color: var(--color-text-dark); /* Darkest shade */
+            margin-bottom: 0.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-card .price {
+            font-size: 1rem;
+            font-weight: 600; /* Semi-bold */
+            color: var(--color-primary); /* Primary brand color */
+            margin-bottom: 0.5rem;
+        }
+
+        .product-card .price .original-price {
+            font-size: 0.875rem;
+            color: #999; /* Medium shade */
+            text-decoration: line-through;
+            margin-left: 0.5rem;
+        }
+
+        .product-card .rating {
+            font-size: 0.75rem;
+            color: var(--color-accent); /* Gold color for stars */
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .product-card .rating .review-count {
+            color: var (--color-text-light); /* Medium shade */
+        }
+
+        /* Global Enhancements */
+        html {
+            scroll-behavior: smooth; /* Smooth scrolling */
+        }
+
+        button, .thumbnail, .color-circle, .style-button, .add-to-cart, .primary-button, .secondary-button {
+            cursor: pointer; /* Indicate interactivity */
+            transition: all 0.2s ease; /* Smooth transitions */
+        }
+
+        button:focus, .thumbnail:focus, .color-circle:focus, .style-button:focus, .add-to-cart:focus, .primary-button:focus, .secondary-button:focus {
+            outline: 2px solid var(--color-primary); /* Focus state for accessibility */
+            outline-offset: 2px;
+        }
+
+        /* Thumbnails */
+        .thumbnail:hover, .thumbnail.active {
+            border-color: var(--color-primary); /* Primary brand color */
+        }
+
+        /* Color Swatches */
+        .color-circle:hover {
+            transform: scale(1.1); /* Scale up on hover */
+        }
+
+        .color-circle.selected::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Style Options */
+        .style-button:hover {
+            border-color: var(--color-primary); /* Primary brand color */
+            color: var(--color-primary);
+        }
+
+        .style-button.selected {
+            background-color: var(--color-primary); /* Primary brand color */
+            color: white; /* Contrasting text */
+            border-color: var(--color-primary);
+        }
+
+        .style-button.out-of-stock {
+            color: #aaa; /* Light shade for text */
+            border-color: #ddd; /* Lighter border */
+            text-decoration: line-through;
+            cursor: not-allowed; /* Disabled cursor */
+        }
+
+        /* Quantity Buttons */
+        .quantity-selector button:hover {
+            background-color: var(--color-border); /* Slightly darker shade */
+        }
+
+        /* Main CTAs */
+        .primary-button:hover, .add-to-cart:hover {
+            background-color: var(--color-primary-dark); /* Darker version of primary color */
+        }
+
+        .primary-button:active, .add-to-cart:active {
+            transform: scale(0.98); /* Subtle scale on click */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Slight shadow change */
+        }
+
+        .secondary-button:hover {
+            background-color: var(--color-background-light); /* Light background */
+            color: var(--color-primary); /* Primary brand color */
+            border-color: var(--color-primary);
+        }
+
+        /* Product Cards */
+        .product-card:hover {
+            transform: translateY(-4px); /* Elevation effect */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+        }
+
+        .product-card .image-container img:hover {
+            transform: scale(1.05); /* Image zoom effect */
+        }
+
+        /* Accessibility Enhancements */
+        .nav a {
+            text-decoration: none;
+        }
+
+        .nav a:focus {
+            outline: 2px solid var(--color-primary); /* Focus state for navigation links */
+            outline-offset: 2px;
+        }
+
+        .product-card .title {
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Limit to 2 lines */
+            line-clamp: 2; /* Standard property for compatibility */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Truncate long text */
+        }
+
+        .product-card .rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .product-card .rating .review-count {
+            color: var(--color-text-light); /* Medium shade */
+        }
+    </style>
+</head>
+<body>
+    <!-- ...existing code before header... -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <a href="/"><img src="/images/parrot-png.png" alt="Bird Shop Logo"></a>
+                <h1>Willy's Bird Shop</h1>
+            </div>
+            <nav class="nav">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/store.html" class="nav-link">Store</a>
+                <a href="/about.html" class="nav-link">About</a>
+                <a href="/contact.html" class="nav-link">Contact</a>
+            </nav>
+            <div class="header-right">
+                <input type="search" class="search-bar" placeholder="Search birds...">
+                <div class="cart-icon" onclick="window.location.href='/checkout.html'">
+                    <img src="/images/trolley.png" alt="Cart" width="30">
+                    <span class="cart-count">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- ...existing code after header... -->
+
+    <!-- Main Content -->
+    <main class="container">
+        <section class="bird-details">
+            <div class="main-content" style="display: flex; gap: 2rem; margin-top: 2rem;">
+                <!-- Bird Image -->
+                <div class="image-section" style="flex: 1;">
+                    <img id="birdImage" src="" alt="Bird Image" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                </div>
+
+                <!-- Bird Details -->
+                <div class="details-section" style="flex: 1;">
+                    <h1 id="birdName" style="font-size: 2.5rem; color: var(--color-text-dark); margin-bottom: 1rem;">Bird Name</h1>
+                    <p id="birdDescription" style="font-size: 1.2rem; color: var(--color-text-medium); line-height: 1.6; margin-bottom: 1.5rem;">
+                        This is a detailed description of the bird. It includes information about its habitat, behavior, and unique features.
+                    </p>
+                    <div style="margin-bottom: 1.5rem;">
+                        <span id="birdPrice" style="font-size: 1.8rem; color: var(--color-primary); font-weight: bold;">$99.99</span>
+                        <span id="birdOriginalPrice" style="font-size: 1.2rem; color: #999; text-decoration: line-through; margin-left: 1rem;">$129.99</span>
+                    </div>
+                    <button style="padding: 0.75rem 1.5rem; background-color: var(--color-primary); color: white; border: none; border-radius: 5px; font-size: 1.2rem; cursor: pointer; transition: background 0.3s;">
+                        Add to Cart
+                    </button>
+                    <button onclick="buyNow()" style="padding: 0.75rem 1.5rem; background-color: var(--color-primary-dark); color: white; border: none; border-radius: 5px; font-size: 1.2rem; cursor: pointer; margin-left: 1rem; transition: background 0.3s;">
+                        Buy Now
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other Birds Section -->
+        <section class="other-birds" style="margin-top: 3rem;">
+            <h3 style="font-size: 2rem; text-align: center; margin-bottom: 2rem;">Other Birds You May Like</h3>
+            <div class="birds-grid" id="otherBirdsList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer style="margin-top: 3rem; padding: 1rem; text-align: center; background-color: var(--color-background-light); color: var(--color-text-medium);">
+        <p>&copy; 2023 Willy's Bird Shop. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Example script to dynamically load "Other Birds You May Like"
+        const otherBirdsList = document.getElementById('otherBirdsList');
+        const sampleBirds = [
+            { name: 'Parrot', price: 99.99, imageUrl: '/images/sample-bird.jpg' },
+            { name: 'Canary', price: 49.99, imageUrl: '/images/sample-bird-2.jpg' },
+            { name: 'Macaw', price: 149.99, imageUrl: '/images/sample-bird-3.jpg' },
+            { name: 'Cockatiel', price: 79.99, imageUrl: '/images/sample-bird-4.jpg' }
+        ];
+
+        sampleBirds.forEach(bird => {
+            const birdCard = document.createElement('div');
+            birdCard.style = 'background-color: var(--color-background-light); padding: 1rem; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); text-align: center;';
+            birdCard.innerHTML = `
+                <img src="${bird.imageUrl}" alt="${bird.name}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+                <h4 style="font-size: 1.2rem; margin-bottom: 0.5rem;">${bird.name}</h4>
+                <p style="font-size: 1rem; color: var(--color-primary); font-weight: bold;">$${bird.price}</p>
+                <button style="padding: 0.5rem 1rem; background-color: var(--color-primary); color: white; border: none; border-radius: 5px; cursor: pointer;">Add to Cart</button>
+            `;
+            otherBirdsList.appendChild(birdCard);
+        });
+
+        // Retrieve the selected bird details from localStorage
+        const selectedBird = JSON.parse(localStorage.getItem('selectedBird'));
+
+        if (selectedBird) {
+            // Update the bird details dynamically
+            document.getElementById('birdImage').src = selectedBird.imageUrl;
+            document.getElementById('birdImage').alt = selectedBird.name;
+            document.getElementById('birdName').textContent = selectedBird.name;
+            document.getElementById('birdDescription').textContent = selectedBird.description;
+            document.getElementById('birdPrice').textContent = `$${selectedBird.price}`;
+            document.getElementById('birdOriginalPrice').textContent = selectedBird.originalPrice ? `$${selectedBird.originalPrice}` : '';
+        } else {
+            console.error('No bird data found in localStorage.');
+        }
+
+        function buyNow() {
+            const selectedBird = JSON.parse(localStorage.getItem('selectedBird'));
+            if (selectedBird) {
+                let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                cart.push(selectedBird);
+                localStorage.setItem('cart', JSON.stringify(cart));
+            }
+            window.location.href = '/checkout.html';
+        }
+
+        // Update: Populate "Other Birds You May Like" section using product-card style and limit to 3 cards
+        // Define exactly 3 birds
+        const otherBirds = [
+            { name: 'Blue Jay', price: 79.99, imageUrl: '/images/blue-jay.jpg' },
+            { name: 'Yellow Canary', price: 49.99, imageUrl: '/images/canary.jpg' },
+            { name: 'Scarlet Macaw', price: 149.99, imageUrl: '/images/owl.jpg' }
+        ];
+        // Clear any existing content
+        otherBirdsList.innerHTML = '';
+        // Populate the section with product-card style cards
+        otherBirds.forEach(bird => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="image-container">
+                    <img src="${bird.imageUrl}" alt="${bird.name}">
+                </div>
+                <div class="content">
+                    <h4 class="title">${bird.name}</h4>
+                    <p class="price">$${bird.price}</p>
+                    <button class="add-to-cart" onclick='addToCart(${JSON.stringify(bird)})'>Add to Cart</button>
+                </div>
+            `;
+            otherBirdsList.appendChild(card);
+        });
+
+    </script>
+</body>
+</html>

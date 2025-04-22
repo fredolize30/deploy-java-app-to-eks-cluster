@@ -1,0 +1,48 @@
+- name: Setup EKS Worker Nodes
+  hosts: eks_workers
+  become: yes
+  vars_files:
+    - ../inventory/group_vars/eks_workers.yml
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install kubectl
+      apt:
+        name: kubectl
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install AWS CLI
+      apt:
+        name: awscli
+        state: present
+
+    - name: Install aws-iam-authenticator
+      get_url:
+        url: https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.9/2020-11-02/bin/linux/amd64/aws-iam-authenticator
+        dest: /usr/local/bin/aws-iam-authenticator
+        mode: '0755'
+      when: ansible_os_family == "Debian"
+
+    - name: Configure kubectl for EKS
+      command: >
+        aws eks update-kubeconfig --name {{ eks_cluster_name }} --region {{ aws_region }}
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
+      register: kubectl_configure
+      changed_when: "'Added new context' in kubectl_configure.stdout"
+
+    - name: Verify kubectl configuration
+      command: kubectl get nodes
+      register: kubectl_output
+      changed_when: false
+      failed_when: "'Ready' not in kubectl_output.stdout"
+      ignore_errors: yes
+
+    - name: Debug kubectl configuration
+      debug:
+        msg: "{{ kubectl_output.stdout }}"
+      when: kubectl_output.failed

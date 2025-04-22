@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bird Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/images/bird-icon.png">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .hero {
+            position: relative;
+            height: 100vh;
+            background: url('/images/parrot.jpg') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 4rem;
+            animation: fadeIn 2s ease-in-out;
+        }
+        .hero p {
+            font-size: 1.5rem;
+            margin-top: 10px;
+            animation: fadeIn 2s ease-in-out 1s;
+        }
+        .hero button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            animation: fadeIn 2s ease-in-out 1.5s;
+        }
+        .hero button:hover {
+            background-color: #45a049;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .features {
+            padding: 50px 20px;
+            text-align: center;
+        }
+        .features h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .features .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .feature-card {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        .feature-card img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .feature-card p {
+            font-size: 1rem;
+            color: #555;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+        }
+        .bird-card .price-tag {
+            font-size: 1rem;
+            color: white; /* Updated font color to white */
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="./images/parrot-png.png" alt="Bird Shop Logo">
+            <h1>Willy's Bird Shop</h1>
+        </div>
+        <div class="header-right">
+            <input type="search" class="search-bar" placeholder="Search birds...">
+            <div class="cart-icon" onclick="window.location.href='/checkout.html'">
+                <img src="./images/trolley.png" alt="Cart" width="30">
+                <span class="cart-count">0</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="nav">
+        <a href="/">Home</a>
+        <a href="/store.html">Store</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+    </div>
+
+    <div class="hero">
+        <div>
+            <h1>Welcome to Willy's Bird Shop</h1>
+            <p>Your one-stop destination for exotic and beautiful birds.</p>
+            <button onclick="window.location.href='/store.html'">Explore Our Store</button>
+        </div>
+    </div>
+
+    <div class="features">
+        <h2>Why Choose Us?</h2>
+        <div class="feature-cards">
+            <div class="feature-card">
+                <img src="/images/canary.jpg" alt="Canary">
+                <h3>Wide Variety of Birds</h3>
+                <p>We offer a diverse selection of birds, from colorful parrots to cheerful canaries.</p>
+            </div>
+            <div class="feature-card">
+                <img src="/images/blue-jay.jpg" alt="Blue Jay">
+                <h3>Expert Care Tips</h3>
+                <p>Our team provides expert advice to help you care for your feathered friends.</p>
+            </div>
+            <div class="feature-card">
+                <img src="/images/owl.jpg" alt="Owl">
+                <h3>Quality Accessories</h3>
+                <p>Find the best cages, toys, and food to keep your birds happy and healthy.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="birds-grid" id="birdsList">
+        <!-- Birds will be loaded here dynamically -->
+    </div>
+
+    <div class="footer">
+        <p>© 2024 Willy's Bird Shop. All rights reserved.</p>
+    </div>
+
+    <script>
+        const birdImages = {
+            'Canary': './images/canary.jpg',
+            'Blue Jay': './images/blue-jay.jpg',
+            'Cockatiel': './images/Cockatiel.jpg',
+            'Parakeet': './images/Parakeet.jpg',
+            'Parrot': './images/parrot.jpg',
+            'Owl': './images/owl.jpg'
+        };
+
+        fetch('/api/birds')
+            .then(response => response.json())
+            .then(birds => {
+                const birdsList = document.getElementById('birdsList');
+                birds.forEach(bird => {
+                    const birdData = JSON.stringify(bird).replace(/"/g, '&quot;'); // Escape quotes for safety
+                    birdsList.innerHTML += `
+                        <div class="bird-card" style="cursor: pointer;" onclick="goToBirdDescription('${birdData}')">
+                            <img src="${birdImages[bird.name] || bird.imageUrl}" alt="${bird.name}">
+                            <h3>${bird.name}</h3>
+                            <p>${bird.description}</p>
+                            <div class="price-tag">$${bird.price}</div>
+                            <div class="view-details" style="cursor: pointer;" onclick="event.stopPropagation(); goToBirdDescription('${birdData}')">
+                                Click for Detailed Description →
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+
+        function goToBirdDescription(birdData) {
+            const bird = JSON.parse(birdData);
+            localStorage.setItem('selectedBird', JSON.stringify(bird));
+            window.location.href = '/bird-description.html';
+        }
+    </script>
+</body>
+</html>

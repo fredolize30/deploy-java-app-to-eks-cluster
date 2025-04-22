@@ -1,0 +1,151 @@
+name: Devsecops CI/CD Pipeline
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository # Check out the repository code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17  
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17          
+          distribution: 'temurin'    
+
+      - name: Cache Maven packages  # Cache Maven packages to speed up build
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-   
+
+      - name: Build with Maven
+        run: mvn clean compile test  # This command does multiple things:
+        # 1. Downloads dependencies from pom.xml
+        # 2. Cleans previous builds
+        # 3. Compiles source code
+        # 4. Runs tests
+
+  dependency-scan:
+    needs: build-and-test 
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/maven@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: --sarif-file-output=snyk.sarif --severity-threshold=high
+
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: snyk.sarif
+          category: snyk-scan
+
+  sonarqube-analysis:
+    needs: dependency-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Sonarqube sonarqube-analysis
+        uses: SonarSource/sonarqube-scan-action@v4.2.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+          SONAR_HOST_URL: "http://${{ secrets.SONARQUBE_HOST }}:9000"
+
+  build-and-push-docker:
+    needs: sonarqube-analysis 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/my-app:latest
+          push: false  # Build but don't push yet  
+
+      - name: Scan Docker Image with Trivy
+        uses: aquasecurity/trivy-action@v0.28.0
+        with:
+          image-ref: ${{ secrets.DOCKER_HUB_USERNAME }}/my-app:latest
+          format: "table"
+          exit-code: "1"  # Fail pipeline on critical/high vulnerabilities
+          severity: "CRITICAL,HIGH"              
+
+      - name: Push Docker Image
+        if: success()  # Only push if Trivy scan passes
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/my-app:latest
+
+  deploy-to-eks:
+    needs: build-and-push-docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1 
+
+      - name: Deploy to EKS
+        run: |
+          aws eks update-kubeconfig --name devsecops-cluster --region us-east-1 // Update kubeconfig to use EKS cluster
+          kubectl apply -f kubernetes/mysql-secret.yaml
+          kubectl apply -f kubernetes/mysql-pv-claim.yaml
+          kubectl apply -f kubernetes/mysql-deployment.yaml
+          kubectl apply -f kubernetes/mysql-service.yaml
+          kubectl apply -f kubernetes/deployment.yaml
+          kubectl apply -f kubernetes/service.yaml
+          kubectl apply -f kubernetes/hpa.yaml
+
+      - name: Send Slack Notification on Success
+        if: success()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        with:
+          args: success
+
+      - name: Send Slack Notification on Failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        with:
+          args: failure

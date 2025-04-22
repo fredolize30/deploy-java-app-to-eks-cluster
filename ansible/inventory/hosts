@@ -1,0 +1,6 @@
+[sonarqube]
+SONARQUBE_server ansible_user=ubuntu-ip 
+
+[eks_workers]
+EKS_WORKER_1_server ansible_user=ubuntu-ip
+EKS_WORKER_2_server ansible_user=ubuntu-ip

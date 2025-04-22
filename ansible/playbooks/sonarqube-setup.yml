@@ -1,0 +1,48 @@
+- name: Setup SonarQube
+  hosts: sonarqube
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create SonarQube directory
+      file:
+        path: /opt/sonarqube
+        state: directory
+        mode: '0755'
+
+    - name: Copy Docker Compose file
+      copy:
+        src: ../files/sonarqube-docker-compose.yml
+        dest: /opt/sonarqube/docker-compose.yml
+
+    - name: Start SonarQube
+      command: docker-compose up -d
+      args:
+        chdir: /opt/sonarqube
+
+    - name: Wait for SonarQube to be ready
+      uri:
+        url: http://localhost:9000
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 10
+      delay: 30

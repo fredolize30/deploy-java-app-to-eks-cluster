@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Store - Willy's Bird Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/images/bird-icon.png">
+    <style>
+        .bird-card .price-tag {
+            font-size: 1rem;
+            color: white; /* Updated font color to white */
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="./images/parrot-png.png" alt="Bird Shop Logo">
+            <h1>Our Birds</h1>
+        </div>
+        <div class="header-right">
+            <input type="search" class="search-bar" placeholder="Search birds...">
+            <div class="cart-icon" onclick="window.location.href='/checkout.html'">
+                <img src="./images/trolley.png" alt="Cart" width="30">
+                <span class="cart-count">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav">
+        <a href="/">Home</a>
+        <a href="/store.html">Store</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+    </div>
+
+    <div id="notification" class="notification"></div>
+    <div class="birds-grid" id="birdsList"></div>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        updateCartCount();
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+
+        function updateCartCount() {
+            document.querySelector('.cart-count').textContent = cart.length;
+        }
+
+        function addToCart(birdData) {
+            const bird = JSON.parse(birdData);
+            cart.push(bird);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showNotification(`${bird.name} added to cart!`);
+        }
+
+        const birdImages = {
+            'Canary': './images/canary.jpg',
+            'Blue Jay': './images/blue-jay.jpg',
+            'Cockatiel': './images/Cockatiel.jpg',
+            'Parakeet': './images/Parakeet.jpg',
+            'Parrot': './images/parrot.jpg',
+            'Owl': './images/owl.jpg'
+        };
+
+        fetch('/api/birds')
+            .then(response => response.json())
+            .then(birds => {
+                const birdsList = document.getElementById('birdsList');
+                birds.forEach(bird => {
+                    const birdData = JSON.stringify(bird).replace(/"/g, '&quot;'); // Escape quotes for safety
+                    birdsList.innerHTML += `
+                        <div class="bird-card" style="cursor: pointer;" onclick="goToBirdDescription('${birdData}')">
+                            <img src="${birdImages[bird.name] || bird.imageUrl}" alt="${bird.name}">
+                            <h3>${bird.name}</h3>
+                            <p>${bird.description}</p>
+                            <div class="price-tag">$${bird.price}</div>
+                            <button class="add-to-cart" onclick="event.stopPropagation(); addToCart('${birdData}')">Add to Cart</button>
+                        </div>
+                    `;
+                });
+            });
+
+        function goToBirdDescription(birdData) {
+            const bird = JSON.parse(birdData);
+            localStorage.setItem('selectedBird', JSON.stringify(bird));
+            window.location.href = '/bird-description.html';
+        }
+    </script>
+</body>
+</html>
