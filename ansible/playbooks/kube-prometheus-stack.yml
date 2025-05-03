@@ -1,0 +1,53 @@
+---
+- name: Deploy kube-prometheus-stack to EKS cluster
+  hosts: localhost  # Run tasks on the local machine (control host)
+  gather_facts: no
+  vars:
+    kubeconfig_path: "{{ lookup('env', 'KUBECONFIG') | default('~/.kube/config', true) }}"  # Path to kubeconfig for cluster access
+    release_name: kube-prometheus-stack  # Helm release name
+    namespace: monitoring  # Namespace for monitoring stack
+    chart_version: ""  # Optional: specify chart version
+  tasks:
+    - name: Ensure Helm is installed
+      ansible.builtin.command: helm version --short
+      register: helm_check
+      ignore_errors: yes
+
+    - name: Install Helm if not present
+      ansible.builtin.shell: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      when: helm_check.rc != 0
+
+    - name: Add Prometheus Community Helm repo
+      ansible.builtin.command: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      register: add_repo
+      changed_when: "'has been added' in add_repo.stdout or 'already exists' not in add_repo.stdout"
+
+    - name: Update Helm repos
+      ansible.builtin.command: helm repo update
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+
+    - name: Create monitoring namespace if not exists
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ namespace }}"
+        kubeconfig: "{{ kubeconfig_path }}"
+
+    - name: Deploy kube-prometheus-stack via Helm
+      community.kubernetes.helm:
+        name: "{{ release_name }}"
+        chart_ref: prometheus-community/kube-prometheus-stack
+        release_namespace: "{{ namespace }}"
+        kubeconfig: "{{ kubeconfig_path }}"
+        create_namespace: true
+        chart_version: "{{ chart_version | default(omit) }}"
+        values: {}
+      register: helm_result
+
+    - name: Show Helm deployment result
+      ansible.builtin.debug:
+        var: helm_result

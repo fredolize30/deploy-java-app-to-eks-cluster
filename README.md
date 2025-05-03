@@ -44,44 +44,43 @@ In this project, we will walk through the process of deploying a Java web applic
 ## Project Structure
 
 ```
-DEPLOY_JAVA-APP_TO_EKS-CLUSTER/
-├── terraform/
-│   ├── main.tf
-│   ├── prometheus_grafana.tf
-│   ├── variables.tf
-│   ├── outputs.tf
-│   ├── provider.tf
-│   ├── iam.tf
-│   ├── backup.tf          # EKS cluster backup configuration
-├── kubernetes/
-│   ├── mysql-secret.yaml
-│   ├── mysql-pv-claim.yaml
-│   ├── mysql-deployment.yaml
-│   ├── deployment.yaml
-│   ├── service.yaml
-│   ├── mysql-service.yaml
-│   ├── hpa.yaml
+deploy-java-app-to-eks-cluster/
 ├── ansible/
-│   ├── playbooks/
-│   │   ├── sonarqube-setup.yml
-│   │   ├── eks-tools.yml
-│   │   ├── security-setup.yml  # Host-level security configuration
-│   ├── inventory/
-│   │   ├── hosts
-│   │   ├── group_vars/
-│   │   │   ├── eks_workers.yml
 │   ├── ansible.cfg
 │   ├── files/
-│   │   ├── sonarqube-docker-compose.yml
-│   ├── templates/          # Added templates directory
-│   │   ├── 20auto-upgrades.j2
-│   │   ├── sshd_config.j2
-│   │   ├── jail.local.j2
+│   │   └── sonarqube-docker-compose.yml
+│   ├── inventory/
+│   │   ├── group_vars/
+│   │   │   └── eks_workers.yml
+│   │   └── hosts
+│   ├── playbooks/
+│   │   ├── eks-tools.yml
+│   │   ├── kube-prometheus-stack.yml
+│   │   └── sonarqube-setup.yml
+├── kubernetes/
+│   ├── deployment.yaml
+│   ├── hpa.yaml
+│   ├── mysql-deployment.yaml
+│   ├── mysql-pv-claim.yaml
+│   ├── mysql-secret.yaml
+│   ├── mysql-service.yaml
+│   ├── service.yaml
+├── terraform/
+│   ├── backup.tf
+│   ├── iam.tf
+│   ├── main.tf
+│   ├── outputs.tf
+│   ├── prometheus_grafana.tf
+│   ├── provider.tf
+│   └── variables.tf
 ├── .github/
-│   ├── workflows/
-│   │   ├── devsecops.yml
+│   └── workflows/
+│       └── devsecops.yml
 ├── Dockerfile
 ├── README.md
+└── docs/
+    └── images/
+        └── architecture.png
 ```
 
 ## Phases of Implementation
@@ -102,11 +101,6 @@ DEPLOY_JAVA-APP_TO_EKS-CLUSTER/
    - ***Provision an EC2 instance for SonarQube:***
      - **main.tf**: This file includes the configuration for provisioning an EC2 instance for SonarQube.
        - Creates an EC2 instance with the necessary security group and IAM role.
-   - ***Install Monitoring Tools:***
-     - **prometheus_grafana.tf**: This file contains the configuration for deploying Prometheus and Grafana using Helm.
-       - Deploys Prometheus and Grafana on the EKS cluster using Helm charts.
-       - Configures Prometheus to scrape metrics from the EKS cluster and the Java application.
-       - Sets up Grafana with dashboards to visualize the metrics collected by Prometheus.
    - ***Backup Configuration:***
      - **backup.tf**: Configures AWS Backup for EKS cluster
        - Creates AWS Backup vault
@@ -147,7 +141,7 @@ DEPLOY_JAVA-APP_TO_EKS-CLUSTER/
      terraform apply
      ```
 
-3. **Verify SonarQube, Prometheus, and Grafana:**
+3. **Verify SonarQube:**
    - **SonarQube**:
      - After provisioning the SonarQube server, you can verify if it is up and running by accessing the SonarQube web interface.
      - Open a web browser and navigate to the SonarQube server URL (e.g., `http://<SonarQube-EC2-IP>:9000`).
@@ -155,28 +149,6 @@ DEPLOY_JAVA-APP_TO_EKS-CLUSTER/
        - Username: `admin`
        - Password: `admin`
      - You will be prompted to change the default password after the first login.
-   - **Prometheus and Grafana**:
-     - **Get the public addresses**:
-       1. Ensure `kubectl` is configured to interact with your EKS cluster. You can configure `kubectl` using the AWS CLI:
-          ```sh
-          aws eks --region <region> update-kubeconfig --name <cluster_name>
-          ```
-          Replace `region` with your AWS region and `cluster_name` with the name of your EKS cluster.
-       2. Get the Services in the Monitoring Namespace:
-          ```sh
-          kubectl get svc -n monitoring
-          ```
-          This command will display the services, including their external IP addresses.
-     - **Accessing Prometheus and Grafana**:
-       - **Access Grafana**: Open a web browser and navigate to the external IP address of the Grafana service:
-         ```sh
-         http://<grafana_ip>:3000
-         ```
-         Log in to Grafana using the admin credentials you set in the Terraform file (admin / admin).
-       - **Access Prometheus**: Open a web browser and navigate to the external IP address of the Prometheus service:
-         ```sh
-         http://<prometheus_ip>:9090
-         ```
 
 ### Phase 2: Ansible Automation and Security
 
@@ -231,7 +203,16 @@ DEPLOY_JAVA-APP_TO_EKS-CLUSTER/
        ansible-playbook playbook.yml --vault-password-file /path/to/vault-password-file
        ```
 
-3. **To execute the Ansible playbooks, run the following commands:**
+3. **Install Monitoring Tools**
+   - **kube-prometheus-stack Helm Chart**: Deploy Prometheus and Grafana using the [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) Helm chart.
+     - Provides a full monitoring stack (Prometheus, Grafana, Alertmanager, node-exporter, etc.) for Kubernetes in the `monitoring` namespace.
+     - Deployment is automated using an Ansible playbook (`ansible/playbooks/kube-prometheus-stack.yml`), which installs the chart with default settings after your EKS cluster is ready and `kubectl` is configured.
+     - To get the Grafana admin password:
+       ```sh
+       kubectl get secret --namespace monitoring kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+       ```
+
+4. **To execute the Ansible playbooks, run the following commands:**
    - **Change to ansible directory**
      ```sh
      cd ansible
@@ -244,7 +225,10 @@ DEPLOY_JAVA-APP_TO_EKS-CLUSTER/
      ```sh
      ansible-playbook ansible/playbooks/eks-tools.yml --ask-vault-pass
      ```
-
+   - **Monitoring Stack Setup**
+     ```sh
+     ansible-playbook ansible/playbooks/kube-prometheus-stack.yml
+     ```
 
 ### Getting the SonarQube Token
 
@@ -288,23 +272,36 @@ DEPLOY_JAVA-APP_TO_EKS-CLUSTER/
      ```
    - This will list all the pods in all namespaces along with their status. Ensure that the pods are running without any issues.
 
+### Accessing Prometheus and grafana:
+- **Accessing Prometheus and Grafana via Port Forwarding:**
+       1. **Prometheus:**
+          ```sh
+          kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090:9090
+          ```
+          Then open [http://localhost:9090](http://localhost:9090) in your browser.
+       2. **Grafana:**
+          ```sh
+          kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:3000
+          ```
+          Then open [http://localhost:3000](http://localhost:3000) in your browser.
+       3. Log in to Grafana using the admin password retrieved above.   
+
 ### Phase 3: Application Setup
 
 1. **Java Web Application Dockerfile**
-   - **Build Stage:**
-     - `FROM maven:3.8.6-openjdk-21 AS builder`: Use the official Maven image with OpenJDK 21 as the base image for building the application.
-     - `WORKDIR /app`: Set the working directory inside the container to `/app`.
-     - `COPY pom.xml .`: Copy the `pom.xml` file to the working directory.
-     - `COPY src ./src`: Copy the `src` directory to the working directory.
-     - `RUN mvn clean package -DskipTests`: Run Maven to clean and package the application, skipping tests.
-   - **Runtime Stage:**
-     - `FROM openjdk:21-slim`: Use the official OpenJDK 21 slim image as the base image for running the application.
-     - `WORKDIR /app`: Set the working directory inside the container to `/app`.
-     - `COPY --from=builder /app/target/my-app.jar my-app.jar`: Copy the JAR file from the builder stage to the working directory.
-     - `RUN useradd -m appuser`: Create a non-root user named `appuser`.
-     - `USER appuser`: Switch to the `appuser` user.
-     - `EXPOSE 8080`: Expose port 8080 for the application.
-     - `CMD ["java", "-jar", "my-app.jar"]`: Define the command to run the application using the `java -jar` command.
+   - The Dockerfile uses a multi-stage build for efficiency and security:
+     - **Build Stage:**
+       - `FROM maven:3.9.9-eclipse-temurin-21-apline AS build`: Uses Maven with Eclipse Temurin OpenJDK 21 to build the application.
+       - `WORKDIR /app`: Sets the working directory.
+       - `COPY pom.xml ./` and `COPY src ./src`: Copies Maven configuration and source code.
+       - `RUN mvn clean package -DskipTests`: Builds the application, skipping tests.
+     - **Runtime Stage:**
+       - `FROM eclipse-temurin:21-jre-jammy`: Uses a lightweight JRE image for running the app.
+       - `WORKDIR /app`: Sets the working directory.
+       - `COPY --from=build /app/target/*.jar app.jar`: Copies the built JAR from the build stage.
+       - `EXPOSE 8080`: Exposes port 8080.
+       - `CMD ["java", "-jar", "app.jar"]`: Starts the application.
+
    - For more details, refer to the [Dockerfile](./Dockerfile).
 
 2. **Kubernetes Manifests**
@@ -375,12 +372,14 @@ DEPLOY_JAVA-APP_TO_EKS-CLUSTER/
      - EKS service discovery enabled
      - Node and pod monitoring
      - Persistent storage for metrics
-     - IAM role for AWS integration
    - Grafana is configured with:
      - Automatic Prometheus data source
-     - LoadBalancer access
      - Persistent storage for dashboards
      - Default admin credentials
+   - **Access Prometheus and Grafana using port forwarding:**
+     - Prometheus: `kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090:9090`
+     - Grafana: `kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:3000`
+     - Then open [http://localhost:9090](http://localhost:9090) for Prometheus and [http://localhost:3000](http://localhost:3000) for Grafana in your browser.
 
 ## Contributing
 
@@ -388,4 +387,5 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. See the LICENSE file for details.
+
