@@ -116,11 +116,8 @@ deploy-java-app-to-eks-cluster/
      - **backend.tf**: Configures S3 backend for state storage
      - **main.tf**: Main infrastructure configuration
      - **variables.tf**: Variable definitions
-     - **prometheus_grafana.tf**: Monitoring stack configuration
-       - Deploys Prometheus with EKS-specific configurations
-       - Sets up Grafana with automatic Prometheus integration
-       - Configures IAM roles for monitoring access
      - **backup.tf**: EKS backup configurations
+     - **outputs.tf**: Returns sonarqube_public_ip, eks_cluster_name, eks_cluster_endpoint.
    - For more details, refer to the [Terraform folder](./terraform).
 
 2. **To provision these resources, run the following commands:**
