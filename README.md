@@ -57,6 +57,7 @@ deploy-java-app-to-eks-cluster/
 │   │   ├── eks-tools.yml
 │   │   ├── kube-prometheus-stack.yml
 │   │   └── sonarqube-setup.yml
+│   ├── templates
 ├── kubernetes/
 │   ├── deployment.yaml
 │   ├── hpa.yaml
@@ -70,7 +71,6 @@ deploy-java-app-to-eks-cluster/
 │   ├── iam.tf
 │   ├── main.tf
 │   ├── outputs.tf
-│   ├── prometheus_grafana.tf
 │   ├── provider.tf
 │   └── variables.tf
 ├── .github/
