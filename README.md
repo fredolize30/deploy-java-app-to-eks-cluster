@@ -269,19 +269,25 @@ deploy-java-app-to-eks-cluster/
      ```
    - This will list all the pods in all namespaces along with their status. Ensure that the pods are running without any issues.
 
-### Accessing Prometheus and grafana:
-- **Accessing Prometheus and Grafana via Port Forwarding:**
-       1. **Prometheus:**
-          ```sh
-          kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090:9090
-          ```
-          Then open [http://localhost:9090](http://localhost:9090) in your browser.
-       2. **Grafana:**
-          ```sh
-          kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:3000
-          ```
-          Then open [http://localhost:3000](http://localhost:3000) in your browser.
-       3. Log in to Grafana using the admin password retrieved above.   
+### Phase 4: Accessing Monitoring Tools
+
+1. **Setup Port Forwarding**
+  - **For Prometheus:**
+    ```sh
+    kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090:9090
+    ```
+    Access via browser: [http://localhost:9090](http://localhost:9090)
+
+  - **For Grafana:**
+    ```sh
+    kubectl port-forward -n monitoring svc/kube-prometheus-stack-grafana 3000:3000
+    ```
+    Access via browser: [http://localhost:3000](http://localhost:3000)
+
+2. **Grafana Login**
+  - Use the admin password retrieved from earlier step
+  - Default username: admin
+  - Navigate to Dashboards to view monitoring metrics  
 
 ### Phase 3: Application Setup
 
