@@ -6,24 +6,23 @@
     kubeconfig_path: "{{ lookup('env', 'KUBECONFIG') | default('~/.kube/config', true) }}"  # Path to kubeconfig for cluster access
     release_name: kube-prometheus-stack  # Helm release name
     namespace: monitoring  # Namespace for monitoring stack
-    chart_version: ""  # Optional: specify chart version
   tasks:
     - name: Ensure Helm is installed
       ansible.builtin.command: helm version --short
-      register: helm_check
+      register: helm_check  # Result of the command stored in the variable helm_check
       ignore_errors: yes
 
     - name: Install Helm if not present
       ansible.builtin.shell: |
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-      when: helm_check.rc != 0
+      when: helm_check.rc != 0 # Check if Helm is not installed 
 
     - name: Add Prometheus Community Helm repo
       ansible.builtin.command: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
       environment:
         KUBECONFIG: "{{ kubeconfig_path }}"
-      register: add_repo
-      changed_when: "'has been added' in add_repo.stdout or 'already exists' not in add_repo.stdout"
+      register: add_repo # Result of the command stored in the variable add_repo
+      changed_when: "'has been added' in add_repo.stdout or 'already exists' not in add_repo.stdout" # This task if the standard output contains 'has been added' or does not contain 'already exists'
 
     - name: Update Helm repos
       ansible.builtin.command: helm repo update
@@ -31,7 +30,7 @@
         KUBECONFIG: "{{ kubeconfig_path }}"
 
     - name: Create monitoring namespace if not exists
-      kubernetes.core.k8s:
+      kubernetes.core.k8s:  # Allows ansible to manage Kubernetes resources declaratively
         api_version: v1
         kind: Namespace
         name: "{{ namespace }}"
@@ -44,9 +43,9 @@
         release_namespace: "{{ namespace }}"
         kubeconfig: "{{ kubeconfig_path }}"
         create_namespace: true
-        chart_version: "{{ chart_version | default(omit) }}"
         values: {}
       register: helm_result
+      # Make sure to install both the kubernetes.core and community.kubernetes collections on local machine
 
     - name: Show Helm deployment result
       ansible.builtin.debug:
