@@ -1,5 +1,5 @@
 ---
-- name: Deploy kube-prometheus-stack to EKS cluster
+- name: Deploy kube-prometheus-stack to EKS cluster # Make sure to configure the kubeconfig file to point to the EKS cluster before running this playbook
   hosts: localhost  # Run tasks on the local machine (control host)
   gather_facts: no
   vars:
